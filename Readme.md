@@ -9,10 +9,13 @@
 # PO
 
 - [ ] Busca GME (Gulosa Melhor Escolha)
+	- [ ] h1
+	- [ ] h2
+	- [ ] adaptar o codigo para rodar com h
 - [ ] Busca Estrela
 
 ## Authors
 
-* **William Castro** - *Initial work* - [Puzzle](https://github.com/wpdcastro)
-* **Bruno Costa**    - *Initial work* - [Puzzle](https://github.com/wpdcastro)
-
+* **William Castro**   - *Initial work* - [Puzzle](https://github.com/wpdcastro)
+* **Bruno Costa**      - *Initial work* - [Puzzle](https://github.com/wpdcastro)
+* **Bárbara Caroline** - *Initial work* - [Puzzle](https://github.com/wpdcastro)
