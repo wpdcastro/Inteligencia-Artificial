@@ -1,14 +1,15 @@
 # OA
 
 - [x] Busca em largura
-- [ ] Busca em profundidade 
-- [ ] Busca profundidade limitade 
-- [ ] Aprofundamento iterativo
+- [x] Busca em profundidade 
+- [x] Busca profundidade limitade 
+- [x] Aprofundamento iterativo
 - [ ] Custo Uniforme
 
-#PO
+# PO
 
 - [ ] Busca GME (Gulosa Melhor Escolha)
+- [ ] Busca Estrela
 
 ## Authors
 
