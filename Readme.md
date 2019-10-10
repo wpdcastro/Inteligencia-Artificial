@@ -9,3 +9,9 @@
 #PO
 
 - [ ] Busca GME (Gulosa Melhor Escolha)
+
+## Authors
+
+* **William Castro** - *Initial work* - [Puzzle](https://github.com/wpdcastro)
+* **Bruno Costa**    - *Initial work* - [Puzzle](https://github.com/wpdcastro)
+
