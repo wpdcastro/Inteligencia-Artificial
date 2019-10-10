@@ -16,15 +16,6 @@ class No () :
 		self.profundidade = profundidade
 		self.custo        = custo
 
-	def busca_profundidade(self, puzzle, lista) : 
-		return self
-
-	def busca_largura(sel0f, puzzle) : 
-		return self
-
-	def comparador(self, puzzle) :
-		return true
-
 	def busca_aprof_iterativa(self, puzzle) :
 		limite = 0
 
@@ -69,13 +60,15 @@ class Agente () :
 			if (puzzle[celula] == 0) :
 				return celula
 
-	def compara(self,puzzle1, puzzle2) :
+	def compara(self,original, objetivo) :
 
-		for p1 in puzzle1 :
-			for p2 in puzzle2 :
+		for chave in original :
+		
+			if original[chave] != objetivo[chave] :
 				
+				return False
 
-		return true
+		return True
 
 	def up(self,puzzle) :
 
@@ -197,10 +190,41 @@ class Agente () :
 
 		return puzzle
 
+	def custo_uniforme(self,puzzle) :
+		teste = puzzle
+		return teste
+
+	def busca_largura(self, lista_nos, objetivo) : 
+		print("Objetivo: ")
+		self.printa_puzzle(objetivo)
+		print("-----------------------")
+		# puxar pelo pai para printar apenas o caminho certo
+		for no in lista_nos :
+			print("-----------------------")
+			self.printa_puzzle(no.estado)
+			print(no.acao)
+			print("-----------------------")
+
+			if self.compara(no.estado,objetivo) == True :
+				print("Achou")
+				self.printa_puzzle(no.estado)
+				break
+			else :
+				print("nao achou")
+				lista_nos = self.sucessor(no, lista_nos)
+
+
+
 
 def main() :
 
 	puzzle = {
+		"a1": 1, "a2": 2, "a3": 0,
+		"b1": 4, "b2": 5, "b3": 3,
+		"c1": 7, "c2": 8, "c3": 6,
+	}
+
+	objetivo = {
 		"a1": 1, "a2": 2, "a3": 3,
 		"b1": 4, "b2": 5, "b3": 6,
 		"c1": 7, "c2": 8, "c3": 0,
@@ -214,12 +238,9 @@ def main() :
 	print("ORIGINAL ------")
 	agente.printa_puzzle(inicio.estado)
 	print("------------")
+	lista_sucessores.append(inicio)
 
-	lista = agente.sucessor(inicio, lista_sucessores)
-	print(lista)
-
-	for l in lista :
-		agente.printa_puzzle(l.estado)
+	agente.busca_largura(lista_sucessores, objetivo)
 	
 
 
