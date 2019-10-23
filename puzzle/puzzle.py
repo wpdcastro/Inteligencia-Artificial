@@ -8,7 +8,7 @@ import copy
 
 class No () :
 	
-	def __init__ (self, estado, pai = "", acao = "", profundidade = "", custo = "", h = "") :
+	def __init__ (self, estado, pai = None, acao = "", profundidade = 0, custo = "", h = "") :
 
 		self.estado       = estado
 		self.pai          = pai
@@ -16,9 +16,6 @@ class No () :
 		self.profundidade = profundidade
 		self.custo        = custo
 		self.h            = h
-
-#ver se ele esta ordenado, se sim retorna true
-#busca em largura 
 
 class Agente () :
 
@@ -32,19 +29,25 @@ class Agente () :
 		print("| %d  | %d  | %d  |" % (puzzle["c1"], puzzle["c2"], puzzle["c3"]))
 		print("+----+----+----+")
 
-	def sucessor(self,puzzle, lista) :
+	def sucessor(self, puzzle, lista) :
 			
-			base_up    = copy.deepcopy(puzzle.estado)
-			base_down  = copy.deepcopy(puzzle.estado)
-			base_left  = copy.deepcopy(puzzle.estado)
-			base_rigth = copy.deepcopy(puzzle.estado)
+		base_up    = copy.deepcopy(puzzle.estado)
+		base_down  = copy.deepcopy(puzzle.estado)
+		base_left  = copy.deepcopy(puzzle.estado)
+		base_rigth = copy.deepcopy(puzzle.estado)
 
-			lista.append(No(self.up(base_up)  , puzzle, "up",    0, 0))
-			lista.append(No(self.down(base_down), puzzle, "down",    0, 0))
-			lista.append(No(self.left(base_left), puzzle, "left",    0, 0))
-			lista.append(No(self.rigth(base_rigth), puzzle, "rigth",    0, 0))
+		if puzzle.profundidade > 0 :
+			profundidade = copy.deepcopy(puzzle.profundidade)
+			profundidade = profundidade + 1
+		else :
+			profundidade = 0
 
-			return lista
+		lista.append(No(self.up(base_up)      , puzzle, "up"   ,  profundidade, 1))
+		lista.append(No(self.down(base_down)  , puzzle, "down" ,  profundidade, 1))
+		lista.append(No(self.left(base_left)  , puzzle, "left" ,  profundidade, 1))
+		lista.append(No(self.rigth(base_rigth), puzzle, "rigth",  profundidade, 1))
+
+		return lista
 
 	def achar_vazio(self,puzzle) :
 			
@@ -182,11 +185,7 @@ class Agente () :
 
 		return puzzle
 
-	def custo_uniforme(self,puzzle) :
-		teste = puzzle
-		return teste
-
-	def busca_largura(self, lista_nos, objetivo) : 
+	def custo_uniforme (self, lista_nos, objetivo) : 
 		print("Objetivo: ")
 		self.printa_puzzle(objetivo)
 		print("-----------------------")
@@ -205,8 +204,35 @@ class Agente () :
 				print("nao achou")
 				lista_nos = self.sucessor(no, lista_nos)
 
+	def busca_largura(self, lista_nos, objetivo) : 
+		# puxar pelo pai para printar apenas o caminho certo
+		for no in lista_nos :
+			#self.printa_puzzle(no.estado)
+
+			if self.compara(no.estado,objetivo) == True :
+				print("Achou")
+				print(no.acao)
+
+				lista_acao = []
+				pai = no.pai
+				lista_acao.append(no.acao)
+
+				while (pai != None) :
+					pai_acao = pai.acao
+					print(pai_acao)
+					lista_acao.append(pai_acao)
+					pai = pai.pai
+
+				#print(pai_acao)
+
+				self.printa_puzzle(no.estado)
+				break
+			else :
+				node = lista_nos.pop(0)
+				lista_nos = self.sucessor(node, lista_nos)
+
 	def h1(self, original, objetivo) :
-				#contar quantos estao fora
+
 		cont = 0; 
 
 		for chave in original :
@@ -223,7 +249,6 @@ class Agente () :
 
 	def busca_profundidade (self, lista_nos, objetivo, limite) :
 
-#		for no in lista_nos : 
 		while len(lista_nos) > 0 :
 			no = lista_nos.pop()
 			if compara(no.estado, objetivo) == True : 
@@ -237,10 +262,9 @@ class Agente () :
 		
 	def busca_profundidade_limitada (self, lista_nos, objetivo, limite) :
 
-#		for no in lista_nos : 
 		while len(lista_nos) > 0 :
 			no = lista_nos.pop()
-			if compara(no.estado, objetivo) == True : 
+			if self.compara(no.estado, objetivo) == True : 
 				print("Achou")
 				self.printa_puzzle(no.estado)
 				return no
@@ -249,15 +273,17 @@ class Agente () :
 					self.sucessor(no, lista_nos)
 		return None
 
-	def busca_profundidade_iterativa () : 
+	def busca_profundidade_iterativa (self, lista_nos, objetivo) : 
+		
 		limite = 0
-			while (r != None) :
-				r = busca_profundidade_limitada()
-				limite = limite + 1
+		
+		while (r != None) :
+			
+			r = busca_profundidade_limitada()
+				
+			limite = limite + 1
+		
 		return r
-
-
-
 
 def main() :
 
@@ -268,9 +294,9 @@ def main() :
 	}
 
 	objetivo = {
-		"a1": 1, "a2": 2, "a3": 0,
-		"b1": 4, "b2": 6, "b3": 3,
-		"c1": 7, "c2": 5, "c3": 8,
+		"a1": 1, "a2": 2, "a3": 3,
+		"b1": 4, "b2": 5, "b3": 6,
+		"c1": 0, "c2": 7, "c3": 8,
 	}
 	
 	lista_sucessores = []
@@ -284,11 +310,11 @@ def main() :
 	lista_sucessores.append(inicio)
 
 	#agente.busca_largura(lista_sucessores, objetivo)
+	no = agente.busca_profundidade_limitada(lista_sucessores, objetivo, 3)
+	print(no.acao)
 
-	h1 = agente.h1(puzzle, objetivo)
-	print(h1)
+	#h1 = agente.h1(puzzle, objetivo)
+	#print(h1)
 	
-
-
 if __name__ == "__main__":
 	main()
