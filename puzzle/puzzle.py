@@ -185,12 +185,13 @@ class Agente () :
 
 		return puzzle
 
-	def custo_uniforme (self, lista_nos, objetivo) : 
+	def custo_uniforme(self, lista_nos, objetivo, lista_ordenada) :
 		print("Objetivo: ")
 		self.printa_puzzle(objetivo)
 		print("-----------------------")
-		# puxar pelo pai para printar apenas o caminho certo
-		for no in lista_nos :
+
+		lista_ordenada = sorted (lista_nos, key = no.custo)
+		for no in lista_ordenada :
 			print("-----------------------")
 			self.printa_puzzle(no.estado)
 			print(no.acao)
@@ -198,11 +199,23 @@ class Agente () :
 
 			if self.compara(no.estado,objetivo) == True :
 				print("Achou")
+				print(no.acao)
+
+				lista_acao = []
+				pai = no.pai
+				lista_acao.append(no.acao)
+
+				while (pai != None) :
+					pai_acao = pai.acao
+					print(pai_acao)
+					lista_acao.append(pai_acao)
+					pai = pai.pai
+
 				self.printa_puzzle(no.estado)
 				break
 			else :
-				print("nao achou")
-				lista_nos = self.sucessor(no, lista_nos)
+				node = lista_nos.pop(0)
+				lista_nos = self.sucessor(node, lista_nos)
 
 	def busca_largura(self, lista_nos, objetivo) : 
 		# puxar pelo pai para printar apenas o caminho certo
