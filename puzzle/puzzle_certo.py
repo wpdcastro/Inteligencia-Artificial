@@ -42,10 +42,10 @@ class Agente () :
 		else :
 			profundidade = 0
 
-		lista.append(No(self.up(base_up)      , puzzle, "up"   ,  profundidade, 1))
-		lista.append(No(self.down(base_down)  , puzzle, "down" ,  profundidade, 1))
-		lista.append(No(self.left(base_left)  , puzzle, "left" ,  profundidade, 1))
-		lista.append(No(self.rigth(base_rigth), puzzle, "rigth",  profundidade, 1))
+		lista.append(No(self.up(base_up)      , puzzle, "down"   ,  profundidade, 1))
+		lista.append(No(self.down(base_down)  , puzzle, "up" ,  profundidade, 1))
+		lista.append(No(self.left(base_left)  , puzzle, "rigth" ,  profundidade, 1))
+		lista.append(No(self.rigth(base_rigth), puzzle, "left",  profundidade, 1))
 
 		return lista
 
@@ -65,7 +65,7 @@ class Agente () :
 
 		return True
 
-	def up(self,puzzle) :
+	def down(self,puzzle) :
 
 			posicao_vazia = self.achar_vazio(puzzle)
 
@@ -95,7 +95,7 @@ class Agente () :
 
 			return puzzle
 
-	def down(self,puzzle):
+	def up(self,puzzle):
 
 			posicao_vazia = self.achar_vazio(puzzle)
 
@@ -125,7 +125,7 @@ class Agente () :
 
 			return puzzle
 
-	def left(self,puzzle) :
+	def rigth(self,puzzle) :
 
 			posicao_vazia = self.achar_vazio(puzzle)
 
@@ -155,7 +155,7 @@ class Agente () :
 
 			return puzzle
 
-	def rigth(self,puzzle) :
+	def left(self,puzzle) :
 		
 		posicao_vazia = self.achar_vazio(puzzle)
 
@@ -218,14 +218,16 @@ class Agente () :
 				lista_nos = self.sucessor(node, lista_nos)
 
 	def busca_largura(self, lista_nos, objetivo) : 
-		# puxar pelo pai para printar apenas o caminho certo
+		i = 0
 		for no in lista_nos :
-			#self.printa_puzzle(no.estado)
-
-			if self.compara(no.estado,objetivo) == True :
+			print("ESTADO")
+			self.printa_puzzle(no.estado)
+			print("OBJETIVO")
+			self.printa_puzzle(objetivo)
+			print(len(lista_nos))
+			if self.compara(no.estado, objetivo) == True :
 				print("Achou")
 				print(no.acao)
-
 				lista_acao = []
 				pai = no.pai
 				lista_acao.append(no.acao)
@@ -235,12 +237,14 @@ class Agente () :
 					print(pai_acao)
 					lista_acao.append(pai_acao)
 					pai = pai.pai
+				return lista_acao
 
-				#print(pai_acao)
-
-				self.printa_puzzle(no.estado)
-				break
 			else :
+				
+				print("AAAAAA NAO")
+				self.printa_puzzle(no.estado)
+				
+		
 				node = lista_nos.pop(0)
 				lista_nos = self.sucessor(node, lista_nos)
 
@@ -302,14 +306,14 @@ def main() :
 
 	puzzle = {
 		"a1": 1, "a2": 2, "a3": 3,
-		"b1": 4, "b2": 5, "b3": 6,
-		"c1": 7, "c2": 8, "c3": 0,
+		"b1": 0, "b2": 5, "b3": 6,
+		"c1": 4, "c2": 7, "c3": 8,
 	}
 
 	objetivo = {
 		"a1": 1, "a2": 2, "a3": 3,
 		"b1": 4, "b2": 5, "b3": 6,
-		"c1": 0, "c2": 7, "c3": 8,
+		"c1": 7, "c2": 8, "c3": 0,
 	}
 	
 	lista_sucessores = []
@@ -322,9 +326,10 @@ def main() :
 	print("------------")
 	lista_sucessores.append(inicio)
 
-	#agente.busca_largura(lista_sucessores, objetivo)
-	no = agente.busca_profundidade_limitada(lista_sucessores, objetivo, 3)
-	print(no.acao)
+	lista_acao = agente.busca_largura(lista_sucessores, objetivo)
+
+	#no = agente.busca_profundidade_limitada(lista_sucessores, objetivo, 3)
+	#print(no.acao)
 
 	#h1 = agente.h1(puzzle, objetivo)
 	#print(h1)
