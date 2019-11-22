@@ -1,23 +1,22 @@
 import os
 import copy
-
-# First Printar Estado Inicial
-# Printar os Sucessores
-#TO DO busca em largura
-#    busca profundidade
+import random
 
 class No () :
 	
-	def __init__ (self, estado, pai = None, acao = "", profundidade = 0, custo = "", h = "") :
+	def __init__ (self, estado, pai = None, acao = "", profundidade = 0, h1 = "", h2 = "") :
 
 		self.estado       = estado
 		self.pai          = pai
 		self.acao         = acao
 		self.profundidade = profundidade
-		self.custo        = custo
-		self.h            = h
+		self.h1           = h1
+		self.h2           = h2
 
 class Agente () :
+
+	def __init__ (self, resultado) :
+		self.objetivo = resultado
 
 	def printa_puzzle(self,puzzle) :
 
@@ -42,10 +41,34 @@ class Agente () :
 		else :
 			profundidade = 0
 
-		lista.append(No(self.up(base_up)      , puzzle, "down"   ,  profundidade, 1))
-		lista.append(No(self.down(base_down)  , puzzle, "up" ,  profundidade, 1))
-		lista.append(No(self.left(base_left)  , puzzle, "rigth" ,  profundidade, 1))
-		lista.append(No(self.rigth(base_rigth), puzzle, "left",  profundidade, 1))
+		no_up     = No(self.down(base_down)  , puzzle, "sobe" ,  profundidade)
+		upH1      = self.heuristicaH1(no_up.estado)
+		no_up.h1  = upH1
+		upH2      = self.heuristicaH2(no_up.estado)
+		no_up.h2  = upH2
+
+		no_down    = No(self.up(base_up), puzzle, "desce"   ,  profundidade)
+		downH1     = self.heuristicaH1(no_down.estado)
+		no_down.h1 = downH1
+		downH2     = self.heuristicaH2(no_down.estado)
+		no_down.h2 = downH2
+
+		no_right    = No(self.left(base_left)  , puzzle, "direita" ,  profundidade)
+		rigthH1     = self.heuristicaH1(no_right.estado)
+		no_right.h1 = rigthH1
+		rigthH2     = self.heuristicaH2(no_right.estado)
+		no_right.h2 = rigthH2
+
+		no_left    = No(self.rigth(base_rigth), puzzle, "esquerda",  profundidade)
+		leftH1     = self.heuristicaH1(no_left.estado)
+		no_left.h1 = leftH1
+		leftH2     = self.heuristicaH2(no_left.estado)
+		no_left.h2 = leftH2
+
+		lista.append(no_down)
+		lista.append(no_up)
+		lista.append(no_right)
+		lista.append(no_left)
 
 		return lista
 
@@ -243,22 +266,88 @@ class Agente () :
 				
 				print("AAAAAA NAO")
 				self.printa_puzzle(no.estado)
-				
-		
 				node = lista_nos.pop(0)
 				lista_nos = self.sucessor(node, lista_nos)
 
-	def h1(self, original, objetivo) :
+	def heuristicaH1(self, original) :
 
 		cont = 0; 
 
 		for chave in original :
-			if objetivo[chave] != 0 :
-				if original[chave] != objetivo[chave] :
+			if self.objetivo[chave] != 0 :
+				if original[chave] != self.objetivo[chave] :
 					cont = cont + 1
-		
-
+	
 		return cont
+	
+	def heuristicaH2(self, original) :
+		
+		a = 1
+
+		return a
+
+	def gme (self, lista_nos, h) :
+		print("GME")
+		
+		for no in lista_nos :
+			if self.compara(no.estado, self.objetivo) == True :
+				print(no.acao)
+				lista_acao = []
+				pai = no.pai
+				lista_acao.append(no.acao)
+				print("final: ")
+				print(lista_nos)
+				while (pai != None) :
+					pai_acao = pai.acao
+					print(pai_acao)
+					lista_acao.append(pai_acao)
+					pai = pai.pai
+				return lista_acao
+
+			else :
+				node = lista_nos.pop(0)
+				lista_nos = self.sucessor(node, lista_nos)
+
+				if h == 1 :
+					for idx, noh in enumerate(lista_nos) :
+						for noh2 in lista_nos :
+							if (idx + 1) < len(lista_nos) :
+								if lista_nos[idx].h1 > lista_nos[int(idx) + 1].h1 : 
+									menor_no = [lista_nos[idx]]
+				#if h == 2 :
+
+				lista_nos = menor_no 
+
+	def aEstrela(self, lista_nos) :
+
+		print("estrela")
+		
+		for no in lista_nos :
+			if self.compara(no.estado, self.objetivo) == True :
+				print(no.acao)
+				lista_acao = []
+				pai = no.pai
+				lista_acao.append(no.acao)
+
+				while (pai != None) :
+					pai_acao = pai.acao
+					print(pai_acao)
+					lista_acao.append(pai_acao)
+					pai = pai.pai
+				return lista_acao
+
+			else :
+				node = lista_nos.pop(0)
+				lista_nos = self.sucessor(node, lista_nos)
+
+				if h == 1 :
+					for idx, noh in enumerate(lista_nos) :
+						for noh2 in lista_nos :
+							if (idx + 1) < len(lista_nos) :
+								if lista_nos[idx].h1 + lista_nos[idx].profundidade > lista_nos[int(idx) + 1].h1 + lista_nos[int(idx) + 1].profundidade : 
+									menor_no = [lista_nos[idx]]
+
+				lista_nos = menor_no 
 
 
 	#def h2(self, original, objetivo) :
@@ -306,8 +395,8 @@ def main() :
 
 	puzzle = {
 		"a1": 1, "a2": 2, "a3": 3,
-		"b1": 0, "b2": 5, "b3": 6,
-		"c1": 4, "c2": 7, "c3": 8,
+		"b1": 4, "b2": 5, "b3": 6,
+		"c1": 0, "c2": 7, "c3": 8,
 	}
 
 	objetivo = {
@@ -318,7 +407,7 @@ def main() :
 	
 	lista_sucessores = []
 
-	agente = Agente()
+	agente = Agente(objetivo)
 	inicio = No(puzzle)
 
 	print("ORIGINAL ------")
@@ -326,13 +415,12 @@ def main() :
 	print("------------")
 	lista_sucessores.append(inicio)
 
-	lista_acao = agente.busca_largura(lista_sucessores, objetivo)
+	lista_acao = agente.gme(lista_sucessores, 1)
+	print(lista_acao)
+	#lista_acao = agente.aEstrela(lista_sucessores, 1)
 
-	#no = agente.busca_profundidade_limitada(lista_sucessores, objetivo, 3)
-	#print(no.acao)
+	#lista_acao = agente.gme(lista_sucessores, 2)
 
-	#h1 = agente.h1(puzzle, objetivo)
-	#print(h1)
 	
 if __name__ == "__main__":
 	main()
