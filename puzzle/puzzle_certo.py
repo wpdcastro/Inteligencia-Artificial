@@ -78,11 +78,11 @@ class Agente () :
 			if (puzzle[celula] == 0) :
 				return celula
 
-	def compara(self,original, objetivo) :
+	def compara(self,original) :
 
 		for chave in original :
 		
-			if original[chave] != objetivo[chave] :
+			if original[chave] != self.objetivo[chave] :
 				
 				return False
 
@@ -288,9 +288,19 @@ class Agente () :
 
 	def gme (self, lista_nos, h) :
 		print("GME")
-		
+		i = 0
+
 		for no in lista_nos :
-			if self.compara(no.estado, self.objetivo) == True :
+			print("atual: ", no.h1)
+			print("----------------------")
+			self.printa_puzzle(no.estado)
+			
+			if i == 2 :
+				exit()
+
+			i += 1
+
+			if self.compara(no.estado) == True :
 				print(no.acao)
 				lista_acao = []
 				pai = no.pai
@@ -307,16 +317,23 @@ class Agente () :
 			else :
 				node = lista_nos.pop(0)
 				lista_nos = self.sucessor(node, lista_nos)
+				lista_nos_aux = copy.deepcopy(lista_nos)
 
 				if h == 1 :
-					for idx, noh in enumerate(lista_nos) :
-						for noh2 in lista_nos :
-							if (idx + 1) < len(lista_nos) :
-								if lista_nos[idx].h1 > lista_nos[int(idx) + 1].h1 : 
-									menor_no = [lista_nos[idx]]
-				#if h == 2 :
+					print("validacao =====")
+					lista_nos = self.sortAmigo(lista_nos)
 
-				lista_nos = menor_no 
+	def sortAmigo(self, lista) :
+
+		elementos = len(lista) - 1
+		ordenado = False
+		while not ordenado : 
+			ordenado = True
+			for i in range(elementos) :
+				if lista[i].h1 > lista[i+1].h1 :
+					lista[i], lista[i+1] = lista[i+1], lista[i]
+					ordenado = False
+		return lista
 
 	def aEstrela(self, lista_nos) :
 
