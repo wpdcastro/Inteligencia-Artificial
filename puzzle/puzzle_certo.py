@@ -4,7 +4,7 @@ import random
 
 class No () :
 	
-	def __init__ (self, estado, pai = None, acao = "", profundidade = 0, h1 = "", h2 = "") :
+	def __init__ (self, estado, pai = None, acao = "", profundidade = 1, h1 = "", h2 = "") :
 
 		self.estado       = estado
 		self.pai          = pai
@@ -240,15 +240,15 @@ class Agente () :
 				node = lista_nos.pop(0)
 				lista_nos = self.sucessor(node, lista_nos)
 
-	def busca_largura(self, lista_nos, objetivo) : 
+	def busca_largura(self, lista_nos) : 
 		i = 0
 		for no in lista_nos :
 			print("ESTADO")
 			self.printa_puzzle(no.estado)
 			print("OBJETIVO")
-			self.printa_puzzle(objetivo)
+			self.printa_puzzle(self.objetivo)
 			print(len(lista_nos))
-			if self.compara(no.estado, objetivo) == True :
+			if self.compara(no.estado) == True :
 				print("Achou")
 				print(no.acao)
 				lista_acao = []
@@ -287,41 +287,28 @@ class Agente () :
 		return a
 
 	def gme (self, lista_nos, h) :
-		print("GME")
-		i = 0
 
-		for no in lista_nos :
-			print("atual: ", no.h1)
-			print("----------------------")
-			self.printa_puzzle(no.estado)
-			
-			if i == 2 :
-				exit()
+		no = lista_nos[0]
 
-			i += 1
+		if self.compara(no.estado) == True :
+			print("Achou")
+			print(no.acao)
+			lista_acao = []
+			pai = no.pai
+			lista_acao.append(no.acao)
 
-			if self.compara(no.estado) == True :
-				print(no.acao)
-				lista_acao = []
-				pai = no.pai
-				lista_acao.append(no.acao)
-				print("final: ")
-				print(lista_nos)
-				while (pai != None) :
-					pai_acao = pai.acao
-					print(pai_acao)
-					lista_acao.append(pai_acao)
-					pai = pai.pai
-				return lista_acao
+			while (pai != None) :
+				pai_acao = pai.acao
+				print(pai_acao)
+				lista_acao.append(pai_acao)
+				pai = pai.pai
+			return lista_acao
 
-			else :
-				node = lista_nos.pop(0)
-				lista_nos = self.sucessor(node, lista_nos)
-				lista_nos_aux = copy.deepcopy(lista_nos)
-
-				if h == 1 :
-					print("validacao =====")
-					lista_nos = self.sortAmigo(lista_nos)
+		else :
+			node = lista_nos.pop(0)	
+			lista_nos = self.sucessor(node, lista_nos)
+			lista_nos = self.sortAmigo(lista_nos)
+			self.gme(lista_nos,1)
 
 	def sortAmigo(self, lista) :
 
@@ -335,36 +322,40 @@ class Agente () :
 					ordenado = False
 		return lista
 
-	def aEstrela(self, lista_nos) :
+	def sortAmigoEstrela(self, lista) :
 
-		print("estrela")
-		
-		for no in lista_nos :
-			if self.compara(no.estado, self.objetivo) == True :
-				print(no.acao)
-				lista_acao = []
-				pai = no.pai
-				lista_acao.append(no.acao)
+		elementos = len(lista) - 1
+		ordenado = False
+		while not ordenado : 
+			ordenado = True
+			for i in range(elementos) :
+				if lista[i].h1 + lista[i].profundidade > lista[i+1].h1 + lista[i+1].profundidade :
+					lista[i], lista[i+1] = lista[i+1], lista[i]
+					ordenado = False
+		return lista
 
-				while (pai != None) :
-					pai_acao = pai.acao
-					print(pai_acao)
-					lista_acao.append(pai_acao)
-					pai = pai.pai
-				return lista_acao
+	def aEstrela(self, lista_nos, h) :
 
-			else :
-				node = lista_nos.pop(0)
-				lista_nos = self.sucessor(node, lista_nos)
+		no = lista_nos[0]
+		if self.compara(no.estado) == True :
+			print("Achou")
+			print(no.acao)
+			lista_acao = []
+			pai = no.pai
+			lista_acao.append(no.acao)
 
-				if h == 1 :
-					for idx, noh in enumerate(lista_nos) :
-						for noh2 in lista_nos :
-							if (idx + 1) < len(lista_nos) :
-								if lista_nos[idx].h1 + lista_nos[idx].profundidade > lista_nos[int(idx) + 1].h1 + lista_nos[int(idx) + 1].profundidade : 
-									menor_no = [lista_nos[idx]]
+			while (pai != None) :
+				pai_acao = pai.acao
+				print(pai_acao)
+				lista_acao.append(pai_acao)
+				pai = pai.pai
+			return lista_acao
 
-				lista_nos = menor_no 
+		else :
+			node = lista_nos.pop(0)	
+			lista_nos = self.sucessor(node, lista_nos)
+			lista_nos = self.sortAmigoEstrela(lista_nos)
+			self.aEstrela(lista_nos,1)
 
 
 	#def h2(self, original, objetivo) :
@@ -411,9 +402,9 @@ class Agente () :
 def main() :
 
 	puzzle = {
-		"a1": 1, "a2": 2, "a3": 3,
-		"b1": 4, "b2": 5, "b3": 6,
-		"c1": 0, "c2": 7, "c3": 8,
+		"a1": 1, "a2": 2, "a3": 0,
+		"b1": 4, "b2": 5, "b3": 3,
+		"c1": 7, "c2": 8, "c3": 6,
 	}
 
 	objetivo = {
@@ -431,8 +422,9 @@ def main() :
 	agente.printa_puzzle(inicio.estado)
 	print("------------")
 	lista_sucessores.append(inicio)
-
+	#agente.busca_largura(lista_sucessores)
 	lista_acao = agente.gme(lista_sucessores, 1)
+	lista_acao = agente.aEstrela(lista_sucessores, 1)
 	print(lista_acao)
 	#lista_acao = agente.aEstrela(lista_sucessores, 1)
 
